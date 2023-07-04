@@ -14,6 +14,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  showHandle: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const isDragging = ref(false);
@@ -47,7 +51,7 @@ const dragEnd = () => {
     :class="{ 'is-dragging': isDragging }"
     :style="{ width: `${horizontal}cm`, height: `${vertical}cm` }"
   >
-    <div class="drag-handle"></div>
+    <div v-if='showHandle' class="drag-handle"></div>
     <img
       :src="imgUrl"
       :style="{ width: `${horizontal}cm`, height: `${vertical}cm` }"

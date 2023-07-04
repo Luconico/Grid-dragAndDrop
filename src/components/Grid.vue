@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
 import Piece from './Piece.vue';
+import html2canvas from 'html2canvas';
 
 interface PieceData {
   horizontal: number;
@@ -15,6 +16,8 @@ interface Cell {
   piece: PieceDataWithId | null;
 }
 
+const gridRef = ref(null);
+const showHandle = ref(true);
 const toRemove = ref(false);
 
 const grid: Ref<Cell[][]> = ref(
@@ -105,17 +108,35 @@ const removePieze = (rowIndex: any, cellIndex: any, piece: any) => {
   }
 }
 
+const takeScreenshot = () => {
+  showHandle.value = false;
+  setTimeout(() => {
+    if (!gridRef.value) return;
+    html2canvas(gridRef.value).then(canvas => {
+      let pngUrl = canvas.toDataURL("image/png");
+      let downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = 'imagen.png';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }).finally(() => {
+      showHandle.value = true;
+    })
+  }, 1);
+};
+
 </script>
 
 <template>
-  <button @click="undo">Undo</button>
+  <button @click="undo">Undo</button><button @click="takeScreenshot">IMG busy-board</button>
   <div class="grid-container">
-    <div class="grid">
+    <div class="grid" ref="gridRef">
       <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row">
         <div v-for="(cell, cellIndex) in row" :key="cellIndex" class="cell" :class="{ 'cell-filled': cell.filled }"
           @dragover.prevent @drop="drop($event, rowIndex, cellIndex)" :id="`cell-${rowIndex}-${cellIndex}`">
           <Piece v-if="cell.piece" :horizontal="cell.piece.horizontal" :vertical="cell.piece.vertical"
-            :imgUrl="cell.piece.image" @dragend="removePieze(rowIndex, cellIndex, cell.piece)" />
+            :imgUrl="cell.piece.image" :showHandle="showHandle" @dragend="removePieze(rowIndex, cellIndex, cell.piece)" />
         </div>
       </div>
     </div>
