@@ -108,22 +108,23 @@ const removePieze = (rowIndex: any, cellIndex: any, piece: any) => {
   }
 }
 
-const takeScreenshot = () => {
+const takeScreenshot = async () => {
   showHandle.value = false;
-  setTimeout(() => {
-    if (!gridRef.value) return;
-    html2canvas(gridRef.value).then(canvas => {
-      let pngUrl = canvas.toDataURL("image/png");
-      let downloadLink = document.createElement("a");
-      downloadLink.href = pngUrl;
-      downloadLink.download = 'imagen.png';
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    }).finally(() => {
-      showHandle.value = true;
-    })
-  }, 1);
+
+  if (!gridRef.value) return;
+  const canvas = await html2canvas(gridRef.value)
+
+  let pngUrl = canvas.toDataURL("image/png");
+  let downloadLink = document.createElement("a");
+  downloadLink.href = pngUrl;
+  downloadLink.download = 'imagen.png';
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+
+  showHandle.value = true;
+
+
 };
 
 </script>
